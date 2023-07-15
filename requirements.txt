@@ -2,3 +2,4 @@
 pyvirtualcam
 mediapipe
 opencv-python
+tqdm
