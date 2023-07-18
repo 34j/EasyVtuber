@@ -6,9 +6,9 @@ from cm_time import timer
 import numpy as np
 from tqdm import tqdm
 
-mouth_eye_variable_index = [2, 3, 14, 25, 26]
-pose_vector_search_space = (np.linspace(-0.1, 0.1, 3), np.linspace(-0.6, 0.6, 3), np.array([0]))
-mouth_eye_vector_search_space = np.linspace(0., 1., 3)
+mouth_eye_variable_index = [2, 3, 14]
+pose_vector_search_space = (np.array([0]), np.linspace(-0.6, 0.6, 3), np.array([0]))
+mouth_eye_vector_search_space = np.linspace(0., 1., 2)
 
 
 class TalkingAnimeLightCached(nn.Module):
