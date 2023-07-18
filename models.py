@@ -24,10 +24,10 @@ class TalkingAnimeLightCached(nn.Module):
         base = f"search/2-{x:g}-{y:g}-{z:g}-0"
         base_out = torch.load(base + ".pt")
         final_out = base_out.clone()
-        for i in mouth_eye_variable_index:
-            s = mouth_eye_vector[0, i].item()
+        for m in mouth_eye_variable_index:
+            s = mouth_eye_vector[0, m].item()
             s = mouth_eye_vector_search_space[np.abs(mouth_eye_vector_search_space - s).argmin()]
-            out = torch.load(f"search/{i:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt")
+            out = torch.load(f"search/{m:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt")
             final_out += out - base_out
         return final_out
 
@@ -80,29 +80,29 @@ def infer_all(image: torch.Tensor) -> None:
     model = TalkingAnimeLight().to("cuda").eval()
     
     spaces = []
-    for i in mouth_eye_variable_index:
+    for m in mouth_eye_variable_index:
         for x in pose_vector_search_space[0]:
             for y in pose_vector_search_space[1]:
                 for z in pose_vector_search_space[2]:
                     for s in mouth_eye_vector_search_space:
-                        spaces.append((i, x, y, z, s))
+                        spaces.append((m, x, y, z, s))
                        
     pbar = tqdm(spaces)
-    batch_size = 20
+    batch_size = 10
     space_chunks = np.array_split(spaces, len(spaces) // batch_size + 1)
     for space_chunk in space_chunks:
         space_chunk = np.array(space_chunk)
         pose_vector = torch.tensor(space_chunk[:, 1:4]).to("cuda", dtype=torch.float32)
         mouth_eye_vector = torch.zeros(len(space_chunk), 27).to("cuda", dtype=torch.float32)
-        for i, _, _, _, s in space_chunk:
-            mouth_eye_vector[0, int(i)] = s
+        for m, _, _, _, s in space_chunk:
+            mouth_eye_vector[0, int(m)] = s
         with torch.no_grad():
             out = model(image.repeat(len(space_chunk), 1, 1, 1)
                         , mouth_eye_vector, pose_vector).detach().cpu()
-        for i, x, y, z, s in space_chunk:
-            i = int(i)
-            pbar.set_description(f"i={i:g}, x={x:g}, y={y:g}, z={z:g}, s={s:g}")
-            torch.save(out[i], f"search/{i:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt")
+        for i, (m, x, y, z, s) in enumerate(space_chunk):
+            m = int(m)
+            pbar.set_description(f"i={m:g}, x={x:g}, y={y:g}, z={z:g}, s={s:g}")
+            torch.save(out[i], f"search/{m:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt")
         pbar.update(len(space_chunk))
         
         
