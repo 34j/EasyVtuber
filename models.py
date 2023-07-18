@@ -22,12 +22,12 @@ class TalkingAnimeLightCached(nn.Module):
         y = pose_vector_search_space[1][np.abs(pose_vector_search_space[1] - y).argmin()]
         z = pose_vector_search_space[2][np.abs(pose_vector_search_space[2] - z).argmin()]
         base = f"search/2-{x:g}-{y:g}-{z:g}-0"
-        base_out = torch.load(base + ".pt")
+        base_out = torch.load(base + ".pt").unsqueeze(0)
         final_out = base_out.clone()
         for m in mouth_eye_variable_index:
             s = mouth_eye_vector[0, m].item()
             s = mouth_eye_vector_search_space[np.abs(mouth_eye_vector_search_space - s).argmin()]
-            out = torch.load(f"search/{m:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt")
+            out = torch.load(f"search/{m:g}-{x:g}-{y:g}-{z:g}-{s:g}.pt").unsqueeze(0)
             final_out += out - base_out
         return final_out
 
