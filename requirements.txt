@@ -1,5 +1,7 @@
-# pytorch
 pyvirtualcam
 mediapipe
 opencv-python
 tqdm
+torch
+cm_time
+joblib
